@@ -3,7 +3,7 @@ import One_News from "../components/One_News.js"
 import { NavIcons } from "../components/NavIcons.js"
 import {useParams} from 'react-router-dom'
 import { ApiFindNews } from "../service/index.js"
-import { useState,useEffect } from "react"
+import React,{ useEffect, useState } from "react";
 
 const receceiveDatas = async (setResponse,id)=>{
   const {datas,status} = await ApiFindNews(id)

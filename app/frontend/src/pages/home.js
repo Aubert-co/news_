@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React ,{ useEffect, useState } from 'react'
 import Box_itens from '../components/Box_itens.js'
 import {NavIcons} from '../components/NavIcons'
 import {TopNav} from '../components/TopNav'
