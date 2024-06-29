@@ -1,6 +1,8 @@
 import React from "react"
 import { PageNews } from "../styles/index.js"
 
+
+
 const map = ({id,title,content,imgPath})=>{
     const img = imgPath.replace('./public','')
     const src = `http://localhost:8080/static${img}`

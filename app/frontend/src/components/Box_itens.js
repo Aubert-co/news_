@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ApiFindCategory, ApiSearch } from "../service/index.js";
 import { Link ,useParams } from "react-router-dom";
-import { List_itens } from "./List_itens.js";
+import { List_itens } from "./List_News.js";
 
 
 const receceiveDatas = async (setDatas,category,search)=>{
