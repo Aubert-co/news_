@@ -1,10 +1,10 @@
 import { Container ,Main,Header} from "../styles/index.js"
-import One_News from "../components/One_News.js"
-import { NavIcons } from "../components/NavIcons.js"
+import {One_News} from "../components/List_News.jsx"
+import { NavIcons } from "../components/NavIcons.jsx"
 import {useParams} from 'react-router-dom'
 import { ApiFindNews } from "../service/index.js"
 import React,{ useEffect, useState } from "react";
-
+import { PageNews } from "../styles/index.js"
 const receceiveDatas = async (setResponse,id)=>{
   const {datas,status} = await ApiFindNews(id)
   setResponse({datas,status})
@@ -27,7 +27,10 @@ export  const News = ()=>{
           <Header>
             <NavIcons/>
          </Header>
-          <One_News response={response}/>
+         <PageNews>
+           <One_News datas={response.datas}/>
+         </PageNews>
+        
       </div>
     </Container>
  )   

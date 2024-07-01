@@ -1,9 +1,9 @@
 import React,{useState} from "react";
 import { Route, BrowserRouter as Router ,Routes  } from "react-router-dom";
 
-import {Home} from './home.js'
-import {Insert} from './insert.js'
-import {News} from './news.js'
+import {Home} from './home'
+import {Insert} from './insert'
+import {News} from './news'
 
 
 export const App = () => {

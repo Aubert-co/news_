@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
 
-export const useFetchPosts = (category)=>{
+/*export const useFetchPosts = (category)=>{
     const [posts,setPosts] = useState([])
 
     useEffect(async()=>{
@@ -9,6 +8,12 @@ export const useFetchPosts = (category)=>{
         setPosts(data)
     },[])
     return posts
+}*/
+export const ApiInsert = async({body})=>{
+    const response = await fetch('http://localhost:8080/insert',
+        {method:'POST',body}
+    )
+    return {status:response.status}
 }
 export const ApiFindCategory = async(category)=>{
     const datas = await fetch(`http://localhost:8080/category/${category}`)

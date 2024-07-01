@@ -1,15 +1,15 @@
 import React,{ useEffect, useRef, useState } from "react";
 import {InsertStyle} from '../styles/insert'
-import { ButtonSendDatas,DivShowWarning } from "../components/ComponentsInsert";
-
+import { ButtonSendDatas } from "../components/InserNews";
+import {DivShowWarning} from '../components/ShowWarning'
 
 const InsertDatasForm =()=>{
-    const [showWarningDiv,setWarningDiv] = useState({msg:null,color:''})
+    const [showWarningDiv,setWarningDiv] = useState({msg:'',color:''})
     const InputValues = {resume:useRef(""),content:useRef(""),title:useRef(""),category:useRef("games"),content:useRef(""),files:useRef("")}
 
     return (
         <div className="flex">
-          <DivShowWarning msg={showWarningDiv.msg} color={showWarningDiv.color} setWarningDiv={setWarningDiv}/> 
+          <DivShowWarning showWarningDiv={showWarningDiv} setWarning={setWarningDiv}/> 
         <div className="inputs">
           
             <div className="itens">

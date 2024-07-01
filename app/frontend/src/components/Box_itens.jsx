@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ApiFindCategory, ApiSearch } from "../service/index.js";
 import { Link ,useParams } from "react-router-dom";
-import { List_itens } from "./List_News.js";
+import { List_itens } from "./List_News.jsx";
 
 
 const receceiveDatas = async (setDatas,category,search)=>{
@@ -24,7 +24,9 @@ export default function Box_itens({searchValues}){
     
     return (
         <div className="news">
-            <List_itens data={getDatas.data}/>
+            <div className="box_news" >
+                <List_itens data={getDatas.data}/>
+            </div>
         </div>
     )
 }
