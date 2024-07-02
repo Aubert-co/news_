@@ -27,6 +27,10 @@ module.exports = (sequelize,DataTypes)=>{
       allowNull:true
     },
     creator:{
+      type:DataTypes.INTEGER,
+      allowNull:false
+    },
+    title:{
       type:DataTypes.STRING,
       allowNull:false
     },
@@ -44,7 +48,8 @@ module.exports = (sequelize,DataTypes)=>{
     }
   },{
     sequelize,
-    modelName:'News'
+    modelName:'News',
+    timestamps:true,
   })
   return News;
 }

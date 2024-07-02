@@ -76,8 +76,12 @@ describe("apis",()=>{
         const response = await request(app)
         .post('/register')
         .set('Content-Type', 'application/json')
-        .send({name:personData.name,password:personData.name})
-        
+         .attach('file','')
+        .field('name',personData.name)
+        .field('password',personData.password)
+
+
+        expect(response.body.message).toEqual('No image were sent in the request.')
         expect(response.status).toBe(400)
         const items = await fs.readdir('./testpublic');
         expect(items.length).toEqual(1)
@@ -87,8 +91,11 @@ describe("apis",()=>{
         const response = await request(app)
         .post('/register')
         .set('Content-Type', 'application/json')
-        .send({name:"",password:"1234"})
-        
+        .attach('file',file)
+        .field('name','')
+        .field('password',personData.password)
+
+        expect(response.body.message).toEqual('Missing fields')
         expect(response.status).toBe(400)
         const items = await fs.readdir('./testpublic');
         expect(items.length).toEqual(1)
@@ -99,8 +106,11 @@ describe("apis",()=>{
         const response = await request(app)
         .post('/register')
         .set('Content-Type', 'application/json')
-        .send({name,password:""})
+        .attach('file','')
+        .field('name',personData.name)
+        .field('password','')
         
+        expect(response.body.message).toEqual('Missing fields')
         expect(response.status).toBe(400)
         const datas = await Person.findOne({where:{name}})
         expect(datas).toBeNull()
@@ -114,11 +124,10 @@ describe("apis",()=>{
         try{
             await Promise.all([
                 Person.destroy({ where: { id: { [Op.gt]: 0 } } }),
+                fs.unlink(img_Path)
             ])
             app.close()
-         
-            await fs.unlink(img_Path)
-        
+    
         }catch(err){
             console.error("afterAll"+err)
         }

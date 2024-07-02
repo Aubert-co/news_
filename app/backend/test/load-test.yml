@@ -1,0 +1,17 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+
+scenarios:
+  - flow:
+      - post:
+          url: "/news/create"
+          formData:
+            title: "Test Title"
+            resume: "Test Resume"
+            content: "Test Content"
+            elements: '[{"title": "Element 1", "order": 1, "text": "Text 1"}, {"title": "Element 2", "order": 2, "text": "Text 2"}]'
+            file-main: "./sports.jpg"
+            file-elements1: ["./sports.jpg"]

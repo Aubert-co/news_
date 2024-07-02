@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cross-env mode=development nodemon ./serve.js",
     "pretest": "cross-env mode=test npx sequelize-cli db:migrate",
-    "test": "yarn cross-env mode=test   jest register.test.js --verbose --forceExit -i",
+    "test": "yarn cross-env mode=test   jest create_news.test.js --verbose --forceExit -i",
     "spec": "jest ./tickets.test.js --verbose --forceExit -i",
     "insert": "jest ./insert/ insert.js --forceExit -i"
   },
@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
+    "artillery": "^2.0.16",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.2",
     "cookie-session": "^2.1.0",

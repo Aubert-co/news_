@@ -1,9 +1,11 @@
 'use strict';
 
+const { INTEGER } = require('sequelize');
+
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable('news',{
+    await queryInterface.createTable('News',{
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -13,8 +15,12 @@ module.exports = {
         type:Sequelize.STRING,
         allowNull:true
       },
-      creator:{
+      title:{
         type:Sequelize.STRING,
+        allowNull:false
+      },
+      creator:{
+        type:Sequelize.INTEGER,
         allowNull:false
       },
       imgPath:{
@@ -22,19 +28,21 @@ module.exports = {
         allowNull:false
       },
       createdAt: {
+        allowNull: true,
         type: Sequelize.DATE,
-        allowNull: false
+        defaultValue: Sequelize.NOW
       },
       updatedAt: {
+        allowNull: true,
         type: Sequelize.DATE,
-        allowNull: false 
+        defaultValue: Sequelize.NOW
       }
     })
   },
 
   async down (queryInterface, Sequelize) {
    
-    await queryInterface.dropTable('news');
+    await queryInterface.dropTable('News');
      
   }
 };

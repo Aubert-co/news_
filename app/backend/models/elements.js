@@ -27,11 +27,11 @@ module.exports = (sequelize,DataTypes)=>{
         type:DataTypes.INTEGER,
         allowNull:false
     },
-    type:{
-        type:DataTypes.ENUM('subtitle','content'),
-        allowNull:false
+    subtitle:{
+      type:DataTypes.STRING,
+      allowNull:true
     },
-    text:{
+    content:{
       type:DataTypes.STRING,
       allowNull:true
     },
@@ -49,7 +49,8 @@ module.exports = (sequelize,DataTypes)=>{
     }
   },{
     sequelize,
-    modelName:'Elements'
+    modelName:'Elements',
+    timestamps:true,
   })
   return Elements;
 }
