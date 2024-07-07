@@ -3,6 +3,7 @@ const authMidlleware = require('../Middleware/auth')
 const {News,Elements} = require('../models/index')
 const fileUpload = require('express-fileupload')
 const {createPathImg,existImg,savesImg} =require('../helpers/saveFiles')
+const { Op } = require('sequelize')
 const fs = require('fs').promises
 const file_element = (order)=>`file-element${order}`
 
@@ -26,6 +27,7 @@ route
         })
         
         const arrayElements = JSON.parse(elements)
+        
         const newArray  = arrayElements.map((val,ind)=>{
             let where = {}
             where.news_id = news.id
@@ -61,24 +63,75 @@ route
         res.status(500).send({message:'Something went wrong'+err})
     }
 })
+.put('/news/update',async(req,res)=>{
+    const {user_id} = req.body
+    const {title,resume,elements,news_id} = req.body
+    let keys;
+    const whereNews = {}
+
+    if(req.files)keys  = Object.keys(req.files)
+    
+    if(news_id){
+        const findNews = await News.findOne({where:{id:news_id,creator:user_id}})
+        if(findNews)return res.status(400).send({message:'News not found'})
+
+        if(title)whereNews.title = title
+        if(resume)whereNews.resume = resume
+        if(keys.includes('file-main'))whereNews.savesImg = savesImg(req.files['file-main'],findNews.imgPath)
+    }
+    const updateNews = News.update(whereNews,{id:news_id,creator:user_id})
+    if(!elements){
+        await Promise.all([updateNews,whereNews.savesImg])
+        return res.status(201).send({message:'News updated'})
+    }
+    const toUpdateElements = JSON.parse( elements )
+    const elementsIds = toUpdateElements.filter((val)=>val.id)
+    const findElements = await Elements.findALl({where:{
+        id:{
+            [Op.in]:[elementsIds]
+        }
+    }})
+    
+    if(!findElements)return res.status(201).send({message:'News updated'})
+        
+    const newValues = toUpdateElements.map((val)=>{
+        if(val.id){
+            const where = {}
+            if(val.order)where.order = val.order
+            if(val.subtitle)where.subtitle = val.subtitle
+            if(val.content)where.content=val.content
+
+        }
+    }) 
+})
 .delete('/news/destroy',async(req,res)=>{
     const {user_id}= req.user
     const {news_id} = req.body
-    let deleteImgNews;
+  
     try {
-        const findNews = await findOne({where:{creator:user_id,id:news_id}})
+        if(!news_id)return res.status(500).send({message:'dont have a news id'})
+        const findNews = await News.findOne({where:{creator:user_id,id:news_id}})
+        
         if(!findNews)return res.status( 500 ).send({message:'error'})
         
         const findElements = await Elements.findAll({where:{news_id}})
-        const deleteFiles = findElements.val((val)=>{
-            if(val.imgPath && existImg(val.imgPath))fs.unlink(val.imgPath)
+        
+        const deleteFiles = findElements.map((val)=>{
+            const exists = existImg(val.imgPath)
+            if(val.imgPath && exists)return fs.unlink(val.imgPath)
             
         })
-        const existImgNews = existImg(findNews.imgPath)
-       
-        await Promise.all([deleteFiles,fs.unlink(findNews.imgPath)])
+
+      
+        const existImgNews =await existImg(findNews.imgPath)
+        if(existImgNews)deleteFiles.push(fs.unlink(findNews.imgPath))
+      
+        const deleteNews =  News.destroy({where:{id:news_id,creator:user_id}})
+        const deleteElements = Elements.destroy({where:{news_id}})
+        await Promise.all([deleteFiles,deleteNews,deleteElements])
         res.status(201).send({message:'Sucess'})
-    } catch (error) {
+    } catch (err) {
+       
         res.status(500).send({message:'Something went wrong'+err})
     }
 })

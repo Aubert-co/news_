@@ -8,7 +8,7 @@ const fs = require('fs').promises
 const jwt = require('jsonwebtoken')
 require('dotenv')
 const secret = process.env.SECRET_JWT
-var app,file,mockFS,buffer,token,file2,buffer2
+var app,file,mockFS,buffer,token,file2,buffer2,news_id
 var imgPaths = []
 var elementsIds = []
 const elements = [{order:1,subtitle:'lorem iptsu1',content:'element 1',file},{order:2,subtitle:'lorem iptsu2',content:'iptsu lorem2',file2}]
@@ -60,7 +60,8 @@ describe("apis",()=>{
         
         const newsInDB = await News.findAll()
         const elementsInDB = await Elements.findAll()
-        imgPaths.push(  newsInDB[0].imgPath )
+        news_id = newsInDB[0].id
+   
 
         expect(elementsInDB).toHaveLength(2)
 
@@ -102,26 +103,61 @@ describe("apis",()=>{
         const newsInDB = await News.findAll()
         const elementsInDB = await Elements.findAll()
         expect(elementsInDB).toHaveLength(elementsBefore.length +2)
-        imgPaths.push(  newsInDB[1].imgPath )
-
+        imgPaths.push(  newsInDB[0].imgPath )
+        imgPaths.push(elementsInDB[1].imgPath)
        
 
-        elementsInDB.map((val,ind)=>{
-            imgPaths.push( val.imgPath )
-            elementsIds.push(val.id)
-        })
 
         expect(newsInDB[0].title).toEqual(title)
         expect(newsInDB[0].resume).toEqual(resume)
   
         
-        imgPaths.map((val)=>{
-            const ExistImg = existImg(val)
-            expect(ExistImg).toBeTruthy()
-        })
        expect(mockFS).toHaveBeenCalledTimes(2)
    
     })
+    it("Should delete only the news and elements from the news_id sent",async()=>{
+        const mockUnlinkFS= jest.spyOn(fs,'unlink')
+
+        const newsBeforeDelete = await News.findAll({where:{id:news_id}})
+        const elemensBeforeDelete = await Elements.findAll({where:{news_id}})
+        const newsImgBeforeDel = newsBeforeDelete[0].imgPath
+        
+        expect(newsBeforeDelete).toHaveLength(1)
+        expect(elemensBeforeDelete).toHaveLength(2)
+        expect(await existImg(newsImgBeforeDel)).toBeTruthy()
+        
+        elemensBeforeDelete.map(async(val)=>{
+            const exists = await existImg(val.imgPath)
+            expect(exists).toBeTruthy()
+        })
+
+        const response = await request(app)
+        .delete('/news/destroy')
+        .set('Content-Type', 'application/json')
+        .set('Authorization',`Bearer ${token}`)
+        .send({news_id})
+        
+        expect(response.body.message).toEqual('Sucess')
+        expect(response.status).toEqual(201)
+        expect(mockUnlinkFS).toHaveBeenCalledTimes(3)
+        
+        const findNews = await News.findAll()
+        const findElements = await Elements.findAll()
+      
+        expect(findNews).toHaveLength(1)
+        expect(findElements).toHaveLength(2)
+
+        expect(await existImg( findNews[0].imgPath )).toBeTruthy()
+
+        const calls = mockUnlinkFS.mock.calls.map((val)=>val.join(''))
+        elemensBeforeDelete.map(async(val,ind)=>{
+            expect(await existImg(val.imgPath)).toBeFalsy()
+            expect(calls[ind]).toEqual(val.imgPath)
+        })
+       
+        expect(calls.includes(newsImgBeforeDel)).toBeTruthy()
+    })
+  
   /*  it("Should delete all elements and destroys images",async()=>{
         const mockUnlinkFS= jest.spyOn(fs,'unlink')
 
@@ -145,7 +181,8 @@ describe("apis",()=>{
             Elements.destroy({ where: { id: { [Op.gt]: 0 } } })
         ])
         imgPaths.map(async(val)=>{
-            if(val && existImg(val) )await fs.unlink(val)
+            const exists = await existImg(val)
+            if(val && exists )await fs.unlink(val)
         })
     
     }catch(err){
