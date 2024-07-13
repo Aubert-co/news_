@@ -29,5 +29,5 @@ async function savesImg(files,imgPath){
     
     await fs.writeFile(imgPath, buffer).catch(err => { throw err; });
 }
-
-module.exports = {existImg ,savesImg ,createPathImg}
+const file_element = (order)=>`file-element${order}`
+module.exports = {existImg ,savesImg ,createPathImg,file_element}
