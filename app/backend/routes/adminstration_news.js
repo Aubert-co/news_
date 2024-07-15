@@ -1,11 +1,11 @@
 const route = require('express')()
 const authMidlleware = require('../Middleware/auth')
-const {News,Elements} = require('../models/index')
+const {News,Elements, sequelize} = require('../models/index')
 const fileUpload = require('express-fileupload')
-const {createPathImg,existImg,savesImg} =require('../helpers/saveFiles')
+const {createPathImg,existImg,savesImg,file_element} =require('../helpers/saveFiles')
 const { Op } = require('sequelize')
 const fs = require('fs').promises
-const file_element = (order)=>`file-element${order}`
+const {generateElements,saveManyImgs} = require('../helpers/index')
 
 route
 .use(authMidlleware)
@@ -14,52 +14,41 @@ route
     const {user_id} = req.user
     const {title,resume,elements} = req.body
     let keys
-    if(!title) return res.status(400).send({message:''})
+    if(!title)return res.status(400).send({ message: 'Title cannot be null.' });
+
         
     if(req.files)keys  = Object.keys(req.files)
-    if(!keys.includes('file-main'))return res.status(400).send({message:''})
-
+    if(!keys.includes('file-main'))return res.status(400).send({message:'The main article needs a image.'})
+    const transaction = await sequelize.transaction()
     try{
         
         const {imgPath} = createPathImg(req.files['file-main'])
-        const news = await News.create({
+        const news =  await News.create({
             imgPath,title,resume,creator:user_id
-        })
-        
+        },{transaction})
+ 
+        if(!elements){
+         
+           
+            await Promise.all([savesImg(req.files['file-main'],imgPath)])
+            await transaction.commit()
+            return res.status(201).send({message:'Sucess'})
+        }
+       
+      
         const arrayElements = JSON.parse(elements)
         
-        const newArray  = arrayElements.map((val,ind)=>{
-            let where = {}
-            where.news_id = news.id
-            where.order = val.order
-            const file = file_element(where.order)
-          
-            if(val.order) where.order=val.order 
-            if(val.subtitle)where.subtitle = val.subtitle
-            if(val.content)where.content = val.content
-            
-            if(keys.includes(file)){
-                const {imgPath} = createPathImg(req.files[file])
-                where.imgPath = imgPath
-            }
-           
-            return where
-        })
-        
-        
-        const promiseFiles =  newArray.map((val)=>{
-            if(!val.imgPath)return 
-            const files = req.files[file_element(val.order)]
-            savesImg(files,val.imgPath)
-        })
-        const mainImg = savesImg(req.files['file-main'],imgPath)
+        const newArray  =generateElements({arrayElements,keys,news_id:news.id,files:req.files})
+      
         await Promise.all([ 
-            mainImg,
-            Elements.bulkCreate( newArray ),
-            promiseFiles
+            Elements.bulkCreate( newArray ,{transaction}),
+            savesImg(req.files['file-main'],imgPath),
+            saveManyImgs( newArray ,req.files)
          ])
+         await transaction.commit()
         res.status(201).send({message:'Sucess'})
     }catch(err){
+        await transaction.rollback()
         res.status(500).send({message:'Something went wrong'+err})
     }
 })
@@ -93,7 +82,7 @@ route
     }})
     
     if(!findElements)return res.status(201).send({message:'News updated'})
-        
+
     const newValues = toUpdateElements.map((val)=>{
         if(val.id){
             const where = {}
@@ -135,39 +124,90 @@ route
         res.status(500).send({message:'Something went wrong'+err})
     }
 })
+.post('/news/elements/create',async(req,res)=>{
+    const {user_id} = req.user
+    const {elements,news_id} = req.body
+   
+    const transaction = await sequelize.transaction()
+    try{    
+        
+        if(!news_id)return res.status(400).send({message:'news_id cannot be null.'})
+        const findNews = await News.findOne({where:{id:news_id,creator:user_id}})
+        if(!findNews)return res.status(400).send({message:'News not found.'})
+        
+        if(!elements)return res.status(400).send({message:'Elements cannot be null'})
+        let arrayElements = JSON.parse(elements)
+        
+        if(!req.files){
+      
+            const newElementsArray = generateElements({arrayElements,files:req.files,news_id:findNews.id})
+            await Elements.bulkCreate( newElementsArray ,{transaction})
+            await transaction.commit()
+            return res.status(201).send({message:'Sucess'})
+        }
+        const keys  = Object.keys(req.files)
+    
+        const newElementsArray = generateElements({arrayElements,keys,files:req.files,news_id:findNews.id})
+     
+        await Promise.all([Elements.bulkCreate( newElementsArray,{transaction}),saveManyImgs(newElementsArray , req.files)
+        ])
+        await transaction.commit()
+        res.status(201).send({message:'Sucess'})
+    }catch(err){ 
+        await transaction.rollback()
+        res.status(500).send({message:'Something went wrong'+err})
+    }
+
+})
 .delete('/news/elements/destroy',async(req,res)=>{
     const {user_id} = req.user
-    const {elements_id} = req.body
-    const ids = [...elements_id]
-
+    const {elements_ids} = req.body
+    const ids = JSON.parse(elements_ids )
+    const imgs = []
+    const t = await sequelize.transaction();
     try{
+    if(!ids )return res.status(400).send({message:'need id'})
+
     const datas= await Elements.findAll({
         include:[{
             model:News,
             as:'news',
-            required:true    
+            required:true ,
+            where:{
+                creator:user_id
+            }
         }],
-        where:{id:ids,'$news.creator$':user_id}
+        where:{id:{
+            [Op.in]:ids
+        }}
     })
+   
+    if(!datas)return res.status(400).send({message:"elements not found"})
 
-    const imgs=datas.map((val)=>{
-        if(val.imgPath && existImg(val.imgPath))fs.unlink(val.imgPath)
+    for(const val of datas){
+        const exists = await existImg(val.imgPath)
+
+        if(val.imgPath && exists)imgs.push(fs.unlink(val.imgPath))
         
-    })
-    const deleteElements =  Elements.findAll({
+    }
+    const deleteElements=  Elements.destroy({
         include:[{
             model:News,
             as:'news',
-            required:true    
+            required:true ,
+            where:{creator:user_id}
         }],
-        where:{id:ids,'$news.creator$':user_id}
-    })
+        where:{id:{[Op.in]:ids}}
+    },{transaction:t})
 
-    await Promise.all([
-        deleteElements, imgs
-    ])
+    await Promise.all([deleteElements,...imgs])
+
+    await t.commit()
+
     res.status(201).send({message:'Sucess'})
     }catch(err){
+        
+        await t.rollback()
         res.status(500).send({message:'Something went wrong'+err})
     }
 })
