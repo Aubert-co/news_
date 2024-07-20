@@ -313,7 +313,7 @@ describe("apis",()=>{
     try{
         
         await Promise.all([
-            DeleteAllFiles,
+            DeleteAllFiles(),
             Person.destroy({ where: { id: { [Op.gt]: 0 } } }),
             News.destroy({ where: { id: { [Op.gt]: 0 } } }),
             Elements.destroy({ where: { id: { [Op.gt]: 0 } } })

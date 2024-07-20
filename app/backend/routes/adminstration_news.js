@@ -29,7 +29,6 @@ route
  
         if(!elements){
          
-           
             await Promise.all([savesImg(req.files['file-main'],imgPath)])
             await transaction.commit()
             return res.status(201).send({message:'Sucess'})
@@ -140,7 +139,7 @@ route
         
         if(!req.files){
       
-            const newElementsArray = generateElements({arrayElements,files:req.files,news_id:findNews.id})
+            const newElementsArray = generateElements({arrayElements,news_id:findNews.id})
             await Elements.bulkCreate( newElementsArray ,{transaction})
             await transaction.commit()
             return res.status(201).send({message:'Sucess'})
@@ -149,8 +148,7 @@ route
     
         const newElementsArray = generateElements({arrayElements,keys,files:req.files,news_id:findNews.id})
      
-        await Promise.all([Elements.bulkCreate( newElementsArray,{transaction}),saveManyImgs(newElementsArray , req.files)
-        ])
+        await Promise.all([Elements.bulkCreate( newElementsArray,{transaction}),saveManyImgs(newElementsArray , req.files)])
         await transaction.commit()
         res.status(201).send({message:'Sucess'})
     }catch(err){ 

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cross-env mode=development nodemon ./serve.js",
     "pretest": "cross-env mode=test npx sequelize-cli db:migrate",
-    "test": "yarn cross-env mode=test   jest create_news.test.js --verbose --forceExit -i",
+    "test": "yarn cross-env mode=test   jest delete_news.test.js --verbose --forceExit -i",
     "spec": "jest ./tickets.test.js --verbose --forceExit -i",
     "insert": "jest ./insert/ insert.js --forceExit -i"
   },
