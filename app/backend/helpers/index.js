@@ -1,5 +1,6 @@
-const {createPathImg,file_element,savesImg} = require('./saveFiles')
-
+const {createPathImg,file_element,savesImg, existImg} = require('./saveFiles')
+const {News,Elements, sequelize} = require('../models/index')
+const fs = require('fs').promises
 function generateElements({arrayElements,keys,news_id,files}){
     if(!Array.isArray(arrayElements))arrayElements = [arrayElements]
     return arrayElements.map((val,index)=>{
@@ -38,4 +39,18 @@ async function saveManyImgs(array,files){
         }
     
 }
-module.exports = {generateElements,saveManyImgs}
+async function deleteManyImgs (array){
+    try{
+    
+        for(const val of array){
+            if(val){
+                const exists =  await existImg(val)
+                if(exists)await fs.unlink(val)
+            }
+        }
+    }catch(err){
+        throw err
+    }
+    
+}
+module.exports = {generateElements,saveManyImgs,deleteManyImgs}
