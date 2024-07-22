@@ -3,9 +3,9 @@ const authMidlleware = require('../Middleware/auth')
 const {News,Elements, sequelize} = require('../models/index')
 const fileUpload = require('express-fileupload')
 const {createPathImg,existImg,savesImg,file_element} =require('../helpers/saveFiles')
-const { Op } = require('sequelize')
+const { Op,Transaction } = require('sequelize')
 const fs = require('fs').promises
-const {generateElements,saveManyImgs} = require('../helpers/index')
+const {generateElements,saveManyImgs,deleteManyImgs,deleteNewsAndElements} = require('../helpers/index')
 
 route
 .use(authMidlleware)
@@ -95,34 +95,42 @@ route
 .delete('/news/destroy',async(req,res)=>{
     const {user_id}= req.user
     const {news_id} = req.body
+    const transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE,})
   
     try {
         if(!news_id)return res.status(500).send({message:'dont have a news id'})
+            
         const findNews = await News.findOne({where:{creator:user_id,id:news_id}})
         
-        if(!findNews)return res.status( 500 ).send({message:'error'})
+        if (!findNews) return res.status(404).send({ message: 'Not found' });
+        
+        
         
         const findElements = await Elements.findAll({where:{news_id}})
         
         const deleteFiles = findElements.map((val)=>{
-            const exists = existImg(val.imgPath)
-            if(val.imgPath && exists)return fs.unlink(val.imgPath)
+          if(val.imgPath)return val.imgPath
             
         })
 
+    
+        deleteFiles.push( findNews.imgPath )
       
-        const existImgNews =await existImg(findNews.imgPath)
-        if(existImgNews)deleteFiles.push(fs.unlink(findNews.imgPath))
+        await Promise.all([
+            News.destroy({where:{id:news_id,creator:user_id}},{transaction}),
+            Elements.destroy({where:{news_id}},{transaction}),
+            deleteManyImgs(deleteFiles)
+        ])
+        await transaction.commit()
       
-        const deleteNews =  News.destroy({where:{id:news_id,creator:user_id}})
-        const deleteElements = Elements.destroy({where:{news_id}})
-        await Promise.all([deleteFiles,deleteNews,deleteElements])
         res.status(201).send({message:'Sucess'})
     } catch (err) {
-       
-        res.status(500).send({message:'Something went wrong'+err})
+        
+        res.status(500).send({message:'Something went wrong'})
     }
 })
+
+
 .post('/news/elements/create',async(req,res)=>{
     const {user_id} = req.user
     const {elements,news_id} = req.body
@@ -206,7 +214,7 @@ route
     }catch(err){
         
         await t.rollback()
-        res.status(500).send({message:'Something went wrong'+err})
+        res.status(500).send({message:'Something went wrong'})
     }
 })
 module.exports = route
