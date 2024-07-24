@@ -53,4 +53,8 @@ async function deleteManyImgs (array){
     }
     
 }
+
+
+
+
 module.exports = {generateElements,saveManyImgs,deleteManyImgs}
