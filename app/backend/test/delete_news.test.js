@@ -17,7 +17,7 @@ describe("apis",()=>{
     beforeEach(()=>{
         jest.clearAllMocks()
         jest.restoreAllMocks(); 
-    
+        
     })
     afterEach(()=>{
         jest.clearAllMocks()
@@ -118,6 +118,7 @@ describe("apis",()=>{
         .mockImplementation(() => {
             throw new Error('failed to destroy');
           });
+        
         const news_id = news[1].id
         const response = await request(app)
         .delete('/news/destroy')
@@ -125,30 +126,26 @@ describe("apis",()=>{
         .set('Authorization',`Bearer ${token}`)
         .send({news_id})
 
-          
+      
         expect(response.body.message).toEqual('Something went wrong')
         expect(response.status).toEqual(500)
-     
         
        
-          setTimeout(async()=>{
-            const [findElements,findNews] = await Promise.all([Elements.findAll({where:{news_id}}), News.findAll({where:{id:news_id}}),])
-       
-            expect(findNews).toHaveLength(1)
-            expect(findElements).toHaveLength(2)
-            expect(mockFS).toHaveBeenCalledTimes(0)
+        const findElements = await Elements.findAll({where:{news_id}})
+        const findNews= await News.findAll({where:{id:news_id}})
+        expect(findElements).toHaveLength(2)
+        expect(findNews).toHaveLength(1)
         
-            const existsImgNews = await existImg(findNews[0].imgPath)
-            expect(existsImgNews).toBeTruthy()
+        expect(mockFS).toHaveBeenCalledTimes(0)
+    
+        const existsImgNews = await existImg(findNews[0].imgPath)
+        expect(existsImgNews).toBeTruthy()
 
-            for(const value of findElements){
-                const exists = await existImg(value.imgPath)
-                expect(exists).toBeTruthy()
-            }
-        
-          },100)
-          
-       
+        for(const value of findElements){
+            const exists = await existImg(value.imgPath)
+            expect(exists).toBeTruthy()
+        }
+            
     })
     
     it("When trying to delete a news item, but the user attempting to delete it does not own the news item.",async()=>{
@@ -184,16 +181,15 @@ describe("apis",()=>{
         }
     })
     it("When an error occurs an error saving the files, it should not delete the items and images.",async()=>{
-        const news_id = news[1].id
-        const n = await News.findAll({where:{id:news_id}})
-        console.log("news",n)
         
+        const news_id = news[1].id
+
         const mockFS = jest.spyOn(fs,'unlink')
         jest.spyOn(fs, 'unlink').mockImplementation(() => {
             return Promise.reject(new Error('Failed to unlink'));
           });
         const mockDBElements = jest.spyOn(News,'destroy')
-
+        const mockDbNews = jest.spyOn(Elements,'destroy')
         const response = await request(app)
         .delete('/news/destroy')
         .set('Content-Type', 'application/json')
@@ -203,12 +199,14 @@ describe("apis",()=>{
           
         expect(response.body.message).toEqual('Something went wrong')
         expect(response.status).toEqual(500)
-     
+          
+        
+        expect(mockFS).toHaveBeenCalledTimes(1)
         const [findElements,findNews] = await Promise.all([Elements.findAll({where:{news_id}}), News.findAll({where:{id:news_id}}),])
     
         expect(findNews).toHaveLength(1)
         expect(findElements).toHaveLength(2)
-        expect(mockFS).toHaveBeenCalledTimes(0)
+        
     
         const existsImgNews = await existImg(findNews[0].imgPath)
         expect(existsImgNews).toBeTruthy()
@@ -217,7 +215,7 @@ describe("apis",()=>{
             const exists = await existImg(value.imgPath)
             expect(exists).toBeTruthy()
         }
-        
+
     })
     /*
     it("When send main news and elements should delete all",async()=>{
@@ -299,7 +297,14 @@ describe("apis",()=>{
     })*/
     afterAll(async()=>{
         try{
+            const news_id = news[1].id
+           
             setTimeout(()=>{},50)
+            const findElements = await Elements.findAll({where:{news_id}})
+            const findNews= await News.findAll({where:{id:news_id}})
+           
+            console.log(findNews,findElements)
+           
             await Promise.all([
                 DeleteAllFiles(),
                 Person.destroy({ where: { id: { [Op.gt]: 0 } } }),

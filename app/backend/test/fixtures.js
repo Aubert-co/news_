@@ -32,6 +32,7 @@ const elements = [
     {id:21,news_id:6,order:2,subtitle:'qetqegqwe',content:'somevalue',imgPath:'./img'},
 ]
 
+
 async function DeleteAllFiles(){
     const directoryPath =  "./testpublic/"
     const files = await fs.readdir(directoryPath);
