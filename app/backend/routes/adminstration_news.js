@@ -95,11 +95,10 @@ route
 .delete('/news/destroy',async(req,res)=>{
     const {user_id}= req.user
     const {news_id} = req.body
-    const transaction = await sequelize.transaction({ isolationLevel: Transaction.ISOLATION_LEVELS.SERIALIZABLE,})
-  
-    try {
+   const transaction = await sequelize.transaction()
+   try {
         if(!news_id)return res.status(500).send({message:'dont have a news id'})
-            
+
         const findNews = await News.findOne({where:{creator:user_id,id:news_id}})
         
         if (!findNews) return res.status(404).send({ message: 'Not found' });
@@ -115,17 +114,20 @@ route
 
     
         deleteFiles.push( findNews.imgPath )
+        
+    
+        await News.destroy({where:{id:news_id,creator:user_id},transaction});
+        await Elements.destroy({where:{news_id},transaction})
       
         await Promise.all([
-            News.destroy({where:{id:news_id,creator:user_id}},{transaction}),
-            Elements.destroy({where:{news_id}},{transaction}),
             deleteManyImgs(deleteFiles)
         ])
+       
         await transaction.commit()
-      
         res.status(201).send({message:'Sucess'})
     } catch (err) {
-        
+        await transaction.rollback()
+       
         res.status(500).send({message:'Something went wrong'})
     }
 })
