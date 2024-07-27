@@ -1,10 +1,9 @@
 const request = require('supertest');
-const server = require('../serve');
 const {Person,News,Elements} = require('../models/index')
 const {Op} = require('sequelize')
 const path = require('path');
 const { existImg } = require('../helpers/saveFiles');
-const {persons,news, DeleteAllFiles} = require('./fixtures')
+const {persons,news, DeleteAllFiles,serverListen} = require('./fixtures')
 const fs = require('fs').promises
 const jwt = require('jsonwebtoken')
 require('dotenv')
@@ -17,7 +16,7 @@ const elements = [{order:1,subtitle:'lorem iptsu1',content:'element 1',file},{or
 const user =  {id:1,name:"matheus",password:'1234567e',imgPath:'oqhwnejkqwne'}
 describe("apis",()=>{
     beforeAll(async()=>{
-        app =  server.listen(8082)
+        app = serverListen
         file = path.join(__dirname, 'sports.jpg');
         file2 =  path.join(__dirname,'imgupdate.jpg')
         try{

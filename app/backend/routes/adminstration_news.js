@@ -97,7 +97,7 @@ route
     const {news_id} = req.body
    const transaction = await sequelize.transaction()
    try {
-        if(!news_id)return res.status(500).send({message:'dont have a news id'})
+        if(!news_id) return res.status(400).send({ message: 'No news ID provided' });
 
         const findNews = await News.findOne({where:{creator:user_id,id:news_id}})
         
@@ -171,7 +171,6 @@ route
     const {user_id} = req.user
     const {elements_ids} = req.body
     const ids = JSON.parse(elements_ids )
-    const imgs = []
     const t = await sequelize.transaction();
     try{
     if(!ids )return res.status(400).send({message:'need id'})
@@ -192,13 +191,7 @@ route
    
     if(!datas)return res.status(400).send({message:"elements not found"})
 
-    for(const val of datas){
-        const exists = await existImg(val.imgPath)
-
-        if(val.imgPath && exists)imgs.push(fs.unlink(val.imgPath))
-        
-    }
-    const deleteElements=  Elements.destroy({
+    await Elements.destroy({
         include:[{
             model:News,
             as:'news',
@@ -207,8 +200,11 @@ route
         }],
         where:{id:{[Op.in]:ids}}
     },{transaction:t})
+    const imgs = datas.filter(({imgPath})=>{
+        if(imgPath)return imgPath
+    })
 
-    await Promise.all([deleteElements,...imgs])
+    await Promise.all([deleteManyImgs(imgs)])
 
     await t.commit()
 

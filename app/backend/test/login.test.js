@@ -1,5 +1,5 @@
 const request = require('supertest');
-const server = require('../serve');
+const {serverListen} = require('./fixtures')
 const {Person} = require('../models/index')
 const jwt = require('jsonwebtoken')
 const {Op} = require('sequelize')
@@ -11,7 +11,7 @@ const personData =  {id:10,name:"lucas",password:'1234567e',imgPath:'imagriquweq
 
 describe("POST/login",()=>{
     beforeAll(async()=>{
-        app =  server.listen(8081)
+        app =  serverListen
         
         const password = await bcrypt.hash(personData.password,10)
         await Person.create( {id:personData.id,name:personData.name,password,imgPath:personData.imgPath} )

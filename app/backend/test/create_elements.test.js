@@ -1,12 +1,11 @@
 const request = require('supertest');
-const server = require('../serve');
 const {Person,News,Elements, sequelize} = require('../models/index')
 const {Op} = require('sequelize')
 const path = require('path');
 const { existImg } = require('../helpers/saveFiles');
 const fs = require('fs').promises
 const jwt = require('jsonwebtoken')
-const {persons,news, DeleteAllFiles} = require('./fixtures')
+const {persons,news, DeleteAllFiles, serverListen} = require('./fixtures')
 require('dotenv')
 const secret = process.env.SECRET_JWT
 var app,file,buffer,token,file2,buffer2
@@ -15,7 +14,7 @@ const elements = [{order:1,subtitle:'lorem iptsu1',content:'element 1',file},{or
 const userLogged = persons[0]
 describe("apis",()=>{
     beforeAll(async()=>{
-        app =  server.listen(8082)
+        app =  serverListen
         file = path.join(__dirname, 'sports.jpg');
         file2 =  path.join(__dirname,'imgupdate.jpg')
         try{

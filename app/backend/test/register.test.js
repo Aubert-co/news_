@@ -1,5 +1,5 @@
 const request = require('supertest');
-const server = require('../serve');
+const {serverListen} = require('./fixtures')
 const {Person} = require('../models/index')
 const {Op} = require('sequelize')
 const bcrypt = require("bcrypt")
@@ -12,7 +12,7 @@ var app,file,img_Path,mockFS,buffer
 const personData =  {name:"matheus",password:'1234567e'}
 describe("apis",()=>{
     beforeAll(async()=>{
-        app =  server.listen(8082)
+        app =  serverListen
         file = path.join(__dirname, 'sports.jpg');
         
     })

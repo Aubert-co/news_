@@ -60,7 +60,7 @@ route
         
         res.status(201).send({message:'sucess'})
     }catch(err){
-        console.log(err)
+     
         res.status(500).send({message:'Oops, something went wrong! Please try again later.'+err})
     }
 })

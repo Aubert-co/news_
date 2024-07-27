@@ -1,4 +1,5 @@
 const { existImg ,createPathImg,savesImg} = require('../helpers/saveFiles')
+const server = require('../serve');
 const path = require('path')
 const fs = require('fs').promises
 const persons =[
@@ -58,6 +59,6 @@ async function NewsWithTruImg (array){
     }
    return array
 }
+const serverListen = server.listen(8083)
 
-
-module.exports = {persons,news,elements,DeleteAllFiles,NewsWithTruImg}
+module.exports = {persons,news,elements,DeleteAllFiles,NewsWithTruImg,serverListen}
