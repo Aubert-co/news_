@@ -61,4 +61,5 @@ async function NewsWithTruImg (array){
 }
 const serverListen = server.listen(8083)
 
+
 module.exports = {persons,news,elements,DeleteAllFiles,NewsWithTruImg,serverListen}

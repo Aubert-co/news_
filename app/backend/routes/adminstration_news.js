@@ -5,11 +5,45 @@ const fileUpload = require('express-fileupload')
 const {createPathImg,existImg,savesImg,file_element} =require('../helpers/saveFiles')
 const { Op,Transaction } = require('sequelize')
 const fs = require('fs').promises
-const {generateElements,saveManyImgs,deleteManyImgs,deleteNewsAndElements} = require('../helpers/index')
+const {generateElements,saveMultipleImages,deleteMultipleImages,deleteNewsAndElements} = require('../helpers/index')
 
 route
 .use(authMidlleware)
 .use( fileUpload({createParentPath:true}) )
+
+.get('/news',async(req,res)=>{
+    const {user_id} = req.user
+
+    try{
+        const datas =  await News.findAll({where:{creator:user_id},limit:10})
+
+        res.status(200).send({message:'Sucess',datas})
+    }catch(err){
+        res.status(500).send({message:'Something went wrong'})
+    }
+})
+.get('/elements/news_id=:news_id',async(req,res)=>{
+    const {user_id} = req.user
+    const news_id = req.params.news_id
+    try{
+        if(!news_id)return res.status(400).send({message:'Not found.'})
+        const datas =  await Elements.findAll({
+            include:[{
+                model:News,
+                as:'news',
+                required:true ,
+                where:{creator:user_id}
+            }],
+                where:{news_id}
+        })
+
+        if(!datas || datas.length ===0)return res.status(400).send({message:'Not found'})
+        res.status(200).send({message:'Sucess',datas})
+    }catch(err){
+        console.log(err)
+        res.status(500).send({message:'Something went wrong'})
+    }
+})
 .post('/news/create',async(req,res)=>{
     const {user_id} = req.user
     const {title,resume,elements} = req.body
@@ -42,13 +76,13 @@ route
         await Promise.all([ 
             Elements.bulkCreate( newArray ,{transaction}),
             savesImg(req.files['file-main'],imgPath),
-            saveManyImgs( newArray ,req.files)
+            saveMultipleImages( newArray ,req.files)
          ])
          await transaction.commit()
         res.status(201).send({message:'Sucess'})
     }catch(err){
         await transaction.rollback()
-        res.status(500).send({message:'Something went wrong'+err})
+        res.status(500).send({message:'Something went wrong'})
     }
 })
 .put('/news/update',async(req,res)=>{
@@ -120,7 +154,7 @@ route
         await Elements.destroy({where:{news_id},transaction})
       
         await Promise.all([
-            deleteManyImgs(deleteFiles)
+            deleteMultipleImages(deleteFiles)
         ])
        
         await transaction.commit()
@@ -158,7 +192,7 @@ route
     
         const newElementsArray = generateElements({arrayElements,keys,files:req.files,news_id:findNews.id})
      
-        await Promise.all([Elements.bulkCreate( newElementsArray,{transaction}),saveManyImgs(newElementsArray , req.files)])
+        await Promise.all([Elements.bulkCreate( newElementsArray,{transaction}),saveMultipleImages(newElementsArray , req.files)])
         await transaction.commit()
         res.status(201).send({message:'Sucess'})
     }catch(err){ 
@@ -170,49 +204,51 @@ route
 .delete('/news/elements/destroy',async(req,res)=>{
     const {user_id} = req.user
     const {elements_ids} = req.body
-    const ids = JSON.parse(elements_ids )
-    const t = await sequelize.transaction();
+    
+    const transaction = await sequelize.transaction();
     try{
-    if(!ids )return res.status(400).send({message:'need id'})
-
-    const datas= await Elements.findAll({
-        include:[{
-            model:News,
-            as:'news',
-            required:true ,
-            where:{
-                creator:user_id
-            }
-        }],
-        where:{id:{
-            [Op.in]:ids
-        }}
-    })
-   
-    if(!datas)return res.status(400).send({message:"elements not found"})
-
-    await Elements.destroy({
-        include:[{
-            model:News,
-            as:'news',
-            required:true ,
-            where:{creator:user_id}
-        }],
-        where:{id:{[Op.in]:ids}}
-    },{transaction:t})
-    const imgs = datas.filter(({imgPath})=>{
-        if(imgPath)return imgPath
-    })
-
-    await Promise.all([deleteManyImgs(imgs)])
-
-    await t.commit()
-
-    res.status(201).send({message:'Sucess'})
-    }catch(err){
         
-        await t.rollback()
+        if( !elements_ids )return res.status(400).send({ message: 'ID is required' });
+        var ids = JSON.parse( elements_ids )
+
+        ids = Array.isArray(ids) ? ids : [ids];
+       
+        const datas= await Elements.findAll({
+            include:[{
+                model:News,
+                as:'news',
+                required:true ,
+                where:{creator:user_id}
+            }],
+            where:{id:{
+                [Op.in]:ids
+            }}
+        })
+    
+        if(!datas || datas.length ===0)return res.status(400).send({message:"elements not found"})
+          
+        await Elements.destroy({
+            include:[{
+                model:News,
+                as:'news',
+                required:true ,
+                where:{creator:user_id}
+            }],
+            where:{id:{[Op.in]:ids}},transaction
+        })
+        const imgs = datas.map((val)=>val.imgPath).filter((val)=>val!==undefined)
+        await Promise.all([
+            deleteMultipleImages(imgs)
+        ])
+        await transaction.commit()
+        
+
+        res.status(201).send({message:'Sucess'})
+    }catch(err){
+    
+        await transaction.rollback()
         res.status(500).send({message:'Something went wrong'})
     }
 })
+
 module.exports = route

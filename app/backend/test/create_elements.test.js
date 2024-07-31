@@ -43,7 +43,7 @@ describe("apis",()=>{
     it( "When a news_id is not sent, it should return an error.",async()=>{
         const mockFS = jest.spyOn(fs,'writeFile')
         const response = await request(app)
-        .post('/news/elements/create')
+        .post('/admin/news/elements/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-element1',file)
@@ -63,7 +63,7 @@ describe("apis",()=>{
     it("When a user sends a news_id that they are not the owner of, it should return an error.",async()=>{
         const mockFS = jest.spyOn(fs,'writeFile')
         const response = await request(app)
-        .post('/news/elements/create')
+        .post('/admin/news/elements/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-element1',file)
@@ -84,7 +84,7 @@ describe("apis",()=>{
     it("When null elements are sent, it should return an error.",async()=>{
         const mockFS = jest.spyOn(fs,'writeFile')
         const response = await request(app)
-        .post('/news/elements/create')
+        .post('/admin/news/elements/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-element1',file)
@@ -105,7 +105,7 @@ describe("apis",()=>{
         const mockFS = jest.spyOn(fs,'writeFile')
     
         const response = await request(app)
-        .post('/news/elements/create')
+        .post('/admin/news/elements/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-element1',file)
@@ -134,7 +134,7 @@ describe("apis",()=>{
         const mockFS = jest.spyOn(fs,'writeFile')
 
         const response = await request(app)
-        .post('/news/elements/create')
+        .post('/admin/news/elements/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .send({'news_id':1,'elements':JSON.stringify( elements )})
@@ -160,7 +160,7 @@ describe("apis",()=>{
         const mockFS = jest.spyOn(fs,'writeFile')
 
         const response = await request(app)
-        .post('/news/elements/create')
+        .post('/admin/news/elements/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-element1',file)
@@ -187,7 +187,7 @@ describe("apis",()=>{
     it("When sending 2 elements, only the second element with an image should save the elements and file correctly.",async()=>{
         const mockFS = jest.spyOn(fs,'writeFile')
         const response = await request(app)
-        .post('/news/elements/create')
+        .post('/admin/news/elements/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-element2',file)
@@ -222,7 +222,7 @@ describe("apis",()=>{
             throw new Error('errorMessage');
           });
         const response = await request(app)
-        .post('/news/elements/create')
+        .post('/admin/news/elements/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-element1',file)
@@ -250,7 +250,7 @@ describe("apis",()=>{
           });
      
         const response = await request(app)
-        .post('/news/elements/create')
+        .post('/admin/news/elements/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-element1',file)
@@ -271,8 +271,9 @@ describe("apis",()=>{
         expect(files).toHaveLength(0)
     })
   afterAll(async()=>{
+    app.close()
     try{
-       const datas =  await Elements.findAll()
+     
        
         await Promise.all([
             DeleteAllFiles(),

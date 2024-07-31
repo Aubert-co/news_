@@ -80,6 +80,7 @@ describe("POST/login",()=>{
         
     })
  afterAll(async()=>{
+    app.close()
     await Person.destroy({ where: { id: { [Op.gt]: 0 } } });
  })
 })

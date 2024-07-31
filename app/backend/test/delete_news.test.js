@@ -14,8 +14,7 @@ var app,file,token,file2,MaiElements,MainNews
 const user = persons[0]
 describe("apis",()=>{
     beforeEach(()=>{
-        jest.clearAllMocks()
-        jest.restoreAllMocks(); 
+       
         
     })
     afterEach(()=>{
@@ -53,7 +52,7 @@ describe("apis",()=>{
         const mockFS = jest.spyOn(fs,'unlink')
         const news_id = news[0].id
         const response = await request(app)
-        .delete('/news/destroy')
+        .delete('/admin/news/destroy')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
        
@@ -86,7 +85,7 @@ describe("apis",()=>{
         //the user dont have this news id
         const news_id = news[2].id
         const response = await request(app)
-        .delete('/news/destroy')
+        .delete('/admin/news/destroy')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .send({news_id})
@@ -115,7 +114,7 @@ describe("apis",()=>{
         const mockFS = jest.spyOn(fs,'unlink')
         const news_id = news[0].id
         const response = await request(app)
-        .delete('/news/destroy')
+        .delete('/admin/news/destroy')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .send({news_id})
@@ -147,7 +146,7 @@ describe("apis",()=>{
         const mockDBElements = jest.spyOn(Elements,'destroy')
         const news_id = news[0].id
         const response = await request(app)
-        .delete('/news/destroy')
+        .delete('/admin/news/destroy')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .send({news_id})
@@ -167,7 +166,7 @@ describe("apis",()=>{
           });
         const news_id = news[1].id
         const response = await request(app)
-        .delete('/news/destroy')
+        .delete('/admin/news/destroy')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .send({news_id})
@@ -200,7 +199,7 @@ describe("apis",()=>{
         
         const news_id = news[1].id
         const response = await request(app)
-        .delete('/news/destroy')
+        .delete('/admin/news/destroy')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .send({news_id})
@@ -239,7 +238,7 @@ describe("apis",()=>{
         const mockDBElements = jest.spyOn(News,'destroy')
         const mockDbNews = jest.spyOn(Elements,'destroy')
         const response = await request(app)
-        .delete('/news/destroy')
+        .delete('/admin/news/destroy')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .send({news_id})
@@ -266,12 +265,10 @@ describe("apis",()=>{
 
     })
     
-    
-    
 
     afterAll(async()=>{
+        app.close()
         try{
-        
             await Promise.all([
                 DeleteAllFiles(),
                 Person.destroy({ where: { id: { [Op.gt]: 0 } } }),
@@ -281,5 +278,5 @@ describe("apis",()=>{
         }catch(err){
             throw err
         }
-        })
+    })
 })

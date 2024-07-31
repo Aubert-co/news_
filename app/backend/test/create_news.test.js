@@ -46,7 +46,7 @@ describe("apis",()=>{
         const resume = "qmkejljqnweklqm"
         const title = "çqwekmrljqnejlq"
         const response = await request(app)
-        .post('/news/create')
+        .post('/admin/news/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-main',file)
@@ -74,7 +74,7 @@ describe("apis",()=>{
         const resume = "qmkejljqnweklqm"
         const title = "çqwekmrljqnejlq"
         const response = await request(app)
-        .post('/news/create')
+        .post('/admin/news/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-main','')
@@ -102,7 +102,7 @@ describe("apis",()=>{
         const resume = "qmkejljqnweklqm"
         const title = "çqwekmrljqnejlq"
         const response = await request(app)
-        .post('/news/create')
+        .post('/admin/news/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-element1',file)
@@ -128,7 +128,7 @@ describe("apis",()=>{
         const resume = "qmkejljqnweklqm"
         const title = "çqwekmrljqnejlq"
         const response = await request(app)
-        .post('/news/create')
+        .post('/admin/news/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-main',file)
@@ -158,7 +158,7 @@ describe("apis",()=>{
         const resume = "qmkejljqnweklqm"
         const title = "çqwekmrljqnejlq"
         const response = await request(app)
-        .post('/news/create')
+        .post('/admin/news/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-main',file)
@@ -195,7 +195,7 @@ describe("apis",()=>{
         const title = "çqwekmrljqnejlq"
       
         const response = await request(app)
-        .post('/news/create')
+        .post('/admin/news/create')
         .set('Content-Type', 'application/json')
         .set('Authorization',`Bearer ${token}`)
         .attach('file-main',file)
@@ -227,7 +227,7 @@ describe("apis",()=>{
           const resume = "qmkejljqnweklqm"
             const title = "çqwekmrljqnejlq"
           const response = await request(app)
-          .post('/news/create')
+          .post('/admin/news/create')
           .set('Content-Type', 'application/json')
           .set('Authorization',`Bearer ${token}`)
           .attach('file-main',file)
@@ -257,7 +257,7 @@ describe("apis",()=>{
           const resume = "qmkejljqnweklqm"
             const title = "çqwekmrljqnejlq"
           const response = await request(app)
-          .post('/news/create')
+          .post('/admin/news/create')
           .set('Content-Type', 'application/json')
           .set('Authorization',`Bearer ${token}`)
           .attach('file-main',file)
@@ -286,7 +286,7 @@ describe("apis",()=>{
           const resume = "qmkejljqnweklqm"
             const title = "çqwekmrljqnejlq"
           const response = await request(app)
-          .post('/news/create')
+          .post('/admin/news/create')
           .set('Content-Type', 'application/json')
           .set('Authorization',`Bearer ${token}`)
           .attach('file-main',file)
@@ -310,7 +310,7 @@ describe("apis",()=>{
    
   afterAll(async()=>{
     try{
-        
+        app.close()
         await Promise.all([
             DeleteAllFiles(),
             Person.destroy({ where: { id: { [Op.gt]: 0 } } }),

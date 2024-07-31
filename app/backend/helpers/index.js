@@ -25,7 +25,8 @@ function generateElements({arrayElements,keys,news_id,files}){
         return where
     })
 }
-async function saveManyImgs(array,files){
+//saveManyImgs
+async function saveMultipleImages(array,files){
     var index = 1
    for(const val of array){
         if(val.imgPath){
@@ -39,9 +40,9 @@ async function saveManyImgs(array,files){
         }
     
 }
-async function deleteManyImgs (array){
+async function deleteMultipleImages (array){
     try{
-    
+        
         for(const val of array){
             if(val){
                 const exists =  await existImg(val)
@@ -55,6 +56,4 @@ async function deleteManyImgs (array){
 }
 
 
-
-
-module.exports = {generateElements,saveManyImgs,deleteManyImgs}
+module.exports = {generateElements,saveMultipleImages,deleteMultipleImages}
