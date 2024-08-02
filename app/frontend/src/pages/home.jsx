@@ -12,7 +12,7 @@ export const Home=()=>{
 
     <Container>
      <div className="container">
-         <Header>
+         <Header>    
             <NavIcons/>
          </Header>
          
