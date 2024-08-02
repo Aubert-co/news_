@@ -1,4 +1,4 @@
-import React from "react";
+/*import React from "react";
 import { generatePath } from "react-router";
 import { Link  } from "react-router-dom";
 
@@ -52,4 +52,4 @@ export  const List_itens=({data})=>{
 export function One_News({datas}){
   if(!datas)return <h1 data-testid="error_one">Algo deu errado!</h1>
   return <List typeNews={"One_News"} datas={datas} />
-}
+}*/
