@@ -12,7 +12,7 @@ export const InsertStyle = styled.div`
 .inputs{
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: start;
     text-align: center;
 }
 .itens{
