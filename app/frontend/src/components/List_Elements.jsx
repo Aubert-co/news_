@@ -1,28 +1,36 @@
 import React, { useEffect } from "react";
 
-
+const file = (file)=>{
+  
+    
+        file = file.current.files
+        console.log(file)
+        return  URL.createObjectURL(file[0])
+    
+}
 export const List_items = ({datas,type})=>{
     
     if(!datas)return
     
-    console.log("datas",datas)
-    const src = (imgPath)=>type ==="preview" ? imgPath[0].files: "localhost:8080"+imgPath
+    
 
     const MapElements = ({values})=>{
+      
        if(!values)return
+        
         return values.map((elements)=>{ 
-        return (   
+            
+            return (   
             <div className="sub-articles">
-                {type === "preview" && <h5 >order {elements.order}</h5>}
-                {elements.subtitle && <h2>{elements.subtitle}</h2>}
-                {elements.imgPath && <img src={src(elements.imgPath)}/>}
-                {elements.content && <p>{elements.content}</p>}
+                {type === "preview" && <h5 >order {elements?.order}</h5>}
+                {elements?.subtitle && <h2>{elements.subtitle}</h2>}
+                {elements?.files && <img src={file(elements.files)}/>}
+                {elements?.content && <p>{elements.content}</p>}
             </div>
         )})
     }
     
     return  datas.map(({news,elements})=>{
-     
         return (
             <>
                 {news?.creator && <h1 >Criador: {news.creator}</h1>}
@@ -31,7 +39,7 @@ export const List_items = ({datas,type})=>{
                     <h1>{news?.content}</h1>
                     <h1>{news?.resume}</h1>
                     <h1> {news?.title}</h1>
-                  {news?.files &&  <img src={src(news.files)}/>}
+                  {news?.files &&  <img src={file(news.files)}/>}
                 </div>
 
                 <MapElements values={elements}/>
