@@ -4,13 +4,19 @@ import { ButtonSendDatas } from "../components/InserNews";
 import {DivShowWarning} from '../components/ShowWarning'
 import { List_items } from "../components/List_Elements";
 
-
-const Elements = ({index,removeSubArticles,setSubArtDatas})=>{
-    const ref = {subTitle:useRef(""),img:useRef(""),content:useRef("")}
+const value = (val)=>val.current.value
+const Elements = ({index,removeSubArticles,setSubArtDatas,setPreview})=>{
+    const ref = {subTitle:useRef(""),file:useRef(""),content:useRef("")}
     const order = index+1
     const addSubArticle= ()=>{
-        const datas = [{subtitle:ref.subTitle,content:ref.content,file:ref.imgPath,order:key}]
-        setSubArtDatas((prev)=>[...prev,datas])
+        const elements = [{subtitle:value(ref.subTitle),content:value(ref.content),files:ref.imgPath,order}]
+        setSubArtDatas((prev)=>[...prev,elements])
+       
+    }
+    const change = ()=>{
+        const elements = [{subtitle:value(ref.subTitle),content:value(ref.content),files:ref.file,order}]
+       
+        setPreview({elements})
     }
     return (
         
@@ -18,18 +24,18 @@ const Elements = ({index,removeSubArticles,setSubArtDatas})=>{
            <h1>Ordem {order}</h1>
             <div className="subtitle">
                 <h1>Adicione um subtitulo</h1>
-                <input type="text"></input>
+                <input onChange={change} ref={ref.subTitle} type="text"></input>
             </div>
             <div className="subimg">
                 <h1>Adicione uma imagem</h1>
-                <input type="file"></input>
+                <input onChange={change} ref={ref.file} type="file"></input>
             </div>
             <div className="subcontent">
                 <h1>Adicione um subcontent</h1>
-                <input type="text"></input>
+                <input onChange={change} type="text" ref={ref.content}></input>
             </div>
             <button onClick={addSubArticle}>Adicionar subartigo {order}</button>
-           {index !== 0 && <button onClick={()=>removeSubArticles(index)}>Remover subartigo {order}</button>}
+        <button onClick={()=>removeSubArticles(index)}>Remover subartigo {order}</button>
         </>
     )
 }
@@ -39,25 +45,23 @@ const InsertDatasForm =()=>{
     const InputValues = {resume:useRef(""),content:useRef(""),title:useRef(""),category:useRef("games"),content:useRef(""),files:useRef("")}
     const [subArticles, setSubArticles] = useState([]);
     const [subArticlesDatas,setSubArtDatas] = useState([])
-    const [preview,setPreview] = useState([])
+    const [preview,setPreview] = useState({news:'',elements:''})
     const addSubArticle = () => {
         setSubArticles([...subArticles, {}]);
       };
 
     const removeSubArticles = (i)=>{
         let newArticles =  subArticles.filter((val,index)=>{index!==i})
-       
+        setPreview({elements:''})
+        if(i  === 0)return setSubArticles([],{})
         setSubArticles([...newArticles,{}])
     }
     const change = ()=>{
-        const value = (val)=>val.current.value
+    
         const news = {resume:value(InputValues.resume),content:value(InputValues.content),title:value(InputValues.title)
-            ,file:value(InputValues.files)}
-        setPreview((prev)=>[...prev,{news}])
+            ,files:InputValues.files}
+        setPreview({news})
     }
-    const datas = [
-        {news:{creator:"lucas",title:"testanto",resume:"resume"}}
-    ]
     return (
         <div className="flex">
           <DivShowWarning showWarningDiv={showWarningDiv} setWarning={setWarningDiv}/> 
@@ -83,11 +87,11 @@ const InsertDatasForm =()=>{
                 <input onChange={change} type="file" className="files" ref={InputValues.files}/>
             </div>
             {subArticles.map((_, index) => (
-                <Elements index={index} key={index} setSubArtDatas={setSubArtDatas} removeSubArticles={removeSubArticles}/>
+                <Elements setPreview={setPreview} index={index} key={index} setSubArtDatas={setSubArtDatas} removeSubArticles={removeSubArticles}/>
             ))}
             <button onClick={addSubArticle}>Adicionar mais subArtigos</button>
 
-            <List_items datas={preview}/>
+            <List_items datas={[preview]}/>
             <ButtonSendDatas setWarningDiv={setWarningDiv} InputValues={InputValues} />
         </div>
     </div>
