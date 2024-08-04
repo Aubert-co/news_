@@ -4,10 +4,10 @@ export const InsertStyle = styled.div`
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background-color: #1e1e1e;
+    background-color: white;
     justify-content: center;
     text-align: center;
-    color: white;
+    color: black;
 }
 .inputs{
     display: flex;
