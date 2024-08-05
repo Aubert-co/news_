@@ -3,7 +3,7 @@ export const InsertStyle = styled.div`
 .flex{
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
     background-color: white;
     justify-content: center;
     text-align: center;
