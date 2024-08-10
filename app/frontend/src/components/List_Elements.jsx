@@ -1,36 +1,11 @@
 import React, { useEffect } from "react";
 
-const file = (file)=>{
-  
-    
-        file = file.current.files
-        console.log(file)
-        return  URL.createObjectURL(file[0])
-    
-}
-export const List_items = ({datas,type})=>{
-    
+
+export const Preview_News = ({datas})=>{
+
     if(!datas)return
     
-    
-
-    const MapElements = ({values})=>{
-      
-       if(!values)return
-        
-        return values.map((elements)=>{ 
-            
-            return (   
-            <div className="sub-articles">
-                {type === "preview" && <h5 >order {elements?.order}</h5>}
-                {elements?.subtitle && <h2>{elements.subtitle}</h2>}
-                {elements?.files && <img src={file(elements.files)}/>}
-                {elements?.content && <p>{elements.content}</p>}
-            </div>
-        )})
-    }
-    
-    return  datas.map(({news,elements})=>{
+    return  datas.map((news)=>{
         return (
             <>
                 {news?.creator && <h1 >Criador: {news.creator}</h1>}
@@ -39,12 +14,35 @@ export const List_items = ({datas,type})=>{
                     <h1>{news?.content}</h1>
                     <h1>{news?.resume}</h1>
                     <h1> {news?.title}</h1>
-                  {news?.files &&  <img src={file(news.files)}/>}
+                  {news?.imgPath &&  <img src={news.imgPath}/>}
                 </div>
-
-                <MapElements values={elements}/>
             </>
         )
     })
 }
 
+export const Preview_SubArticles = ({datas})=>{
+        console.log("subArticles",datas)
+        if(!datas)return
+         
+         return datas.map((elements)=>{ 
+           
+             return (   
+             <div className="sub-articles">
+                 {<h5 >order {elements?.order}</h5>}
+                 {elements?.subtTitle && <h2>{elements.subTitle}</h2>}
+                 {elements?.imgPath && <img src={elements.imgPath}/>}
+                 {elements?.content && <p>{elements.content}</p>}
+             </div>
+         )})
+     
+}
+export const Preview = ({datas})=>{
+    
+   return (
+   <>
+    {datas?.news && <Preview_News datas={datas.news}/>}
+    {datas?.elements&& <Preview_SubArticles datas={datas.elements}/>}
+   </>
+   )
+}
