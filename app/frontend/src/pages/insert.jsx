@@ -2,29 +2,25 @@ import React,{ useEffect, useRef, useState } from "react";
 import {InsertStyle} from '../styles/insert'
 import { ButtonSendDatas } from "../components/InserNews";
 import {DivShowWarning} from '../components/ShowWarning'
-import { Preview } from "../components/List_Elements";
+import { Preview } from "../components/PreviewArticle";
+import { newImgPath,removeItem } from "../utils";
 
-const value = (val)=>val.current.value
-const file = (file)=>{
-    
-    file = file.current.files
-    if(file.length ===0)return
-    
-    return  URL.createObjectURL(file[0])
-}
+
+
+const getCurrentValue = (val)=>val.current.value
 const Elements = ({order,setSubArticles,setSubArtDatas})=>{
     const ref = {subTitle:useRef(""),imgPath:useRef(""),content:useRef("")}
     
 
-    const removeSubArticles = (i)=>{
-        i = i-1
-        setSubArticles((datas)=>datas.filter((_, index) => i !== index));
-        setSubArtDatas((datas)=>datas.filter((_,index)=>i!==index))
+    const removeSubArticles = (item)=>{
+        item = item-1
+        setSubArticles((datas)=>removeItem(datas,item));
+        setSubArtDatas((datas)=>removeItem(datas,item))
         
     }  
 
     useEffect(()=>{
-        const elements = [{subTitle:value(ref.subTitle),content:value(ref.content),files:ref.imgPath,order}]
+        const elements = [{subTitle:getCurrentValue(ref.subTitle),content:getCurrentValue(ref.content),files:ref.imgPath,order}]
         
         setSubArtDatas((prev)=>[...prev,...elements]);
     },[])
@@ -32,11 +28,10 @@ const Elements = ({order,setSubArticles,setSubArtDatas})=>{
     
     const change = ()=>{
         
-       
         const filter = (datas)=>datas.map((val) => {
            if(val.order === order){
 
-            return {   subTitle:value(ref.subTitle),content:value(ref.content),imgPath:file(ref.imgPath),order:val.order}
+            return {   subTitle:getCurrentValue(ref.subTitle),content:getCurrentValue(ref.content),imgPath:newImgPath(ref.imgPath),order:val.order}
            }
            return val
         });
@@ -47,17 +42,17 @@ const Elements = ({order,setSubArticles,setSubArtDatas})=>{
     const removerImg = ()=>{
       
         const filter = (datas)=>datas.map((val) => {
-            console.log('here',val)
+    
            if(val.order === order){
            
-           
-            return {   subTitle:value(ref.subTitle),content:value(ref.content),imgPath: ''}
+             ref.imgPath.current.value = ""
+            return { ...val,imgPath: ''}
            
            }
            return val
         });
         setSubArtDatas(filter)
-     
+        
     }
     return (
         
@@ -84,7 +79,7 @@ const Elements = ({order,setSubArticles,setSubArtDatas})=>{
     )
 }
 
-const InsertDatasForm =()=>{
+export const CreateArticlesForm =()=>{
     const [showWarningDiv,setWarningDiv] = useState({msg:'',color:''})
     const InputValues = {resume:useRef(""),content:useRef(""),title:useRef(""),
         category:useRef("games"),content:useRef(""),imgPath:useRef("")}
@@ -96,13 +91,12 @@ const InsertDatasForm =()=>{
        
       };
 
-   
-    
+
   
     const change = ()=>{
     
-        const news = {resume:value(InputValues.resume),content:value(InputValues.content),title:value(InputValues.title)
-            ,imgPath:file(InputValues.imgPath)}
+        const news = {resume:getCurrentValue(InputValues.resume),content:getCurrentValue(InputValues.content),title:getCurrentValue(InputValues.title)
+            ,imgPath:newImgPath(InputValues.imgPath)}
             setPreviewNews(news);
     }
     
@@ -114,22 +108,22 @@ const InsertDatasForm =()=>{
            <div className="main-form">
             <div className="forms">
                     <h1>Adicionar Artigo Principal</h1>
-                    <textarea onChange={change}  className="contentText" ref={InputValues.content} rows="7" cols="40" placeholder="CONTENT"></textarea>
+                    <textarea data-testid="content" onChange={change}  className="contentText" ref={InputValues.content} rows="7" cols="40" placeholder="CONTENT"></textarea>
                 </div>
 
                 <div className="forms">
                     <h1>Adicionar titulo</h1>
-                    <input onChange={change} type="text" className="filesOne" placeholder="Title" ref={InputValues.title}/>
+                    <input data-testid="title" onChange={change} type="text" className="filesOne" placeholder="Title" ref={InputValues.title}/>
                 </div>
                 
                 <div className="forms">
                     <h1>Adicionar resumo</h1>
-                    <textarea onChange={change} className="resumeText" key="resume" maxLength={150}  ref={InputValues.resume} rows="4" cols="20" placeholder="RESUME"></textarea>
+                    <textarea data-testid="resume" onChange={change} className="resumeText" key="resume" maxLength={150}  ref={InputValues.resume} rows="4" cols="20" placeholder="RESUME"></textarea>
                 </div>
                 
                 <div className="forms">
                     <h1>Adicionar Image</h1>    
-                    <input onChange={change} type="file" className="files" ref={InputValues.imgPath}/>
+                    <input data-testid="img" onChange={change} type="file" className="files" ref={InputValues.imgPath}/>
                 </div>
            </div>
            <div className="form-elements">
@@ -153,7 +147,7 @@ const InsertDatasForm =()=>{
 export const Insert = ()=>{
     return (
         <InsertStyle>
-                <InsertDatasForm/>
+                <CreateArticlesForm/>
         </InsertStyle>
     )
 }

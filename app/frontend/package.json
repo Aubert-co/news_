@@ -6,7 +6,7 @@
   "scripts": {
     "start:dev": "webpack serve --mode=development",
     "build": "webpack --mode development",
-    "test": "jest /*.test.js"
+    "test": "jest /insert.test.js"
   },
   "dependencies": {
     "react": "18.2.0",

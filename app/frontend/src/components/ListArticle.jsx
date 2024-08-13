@@ -54,7 +54,7 @@ export function One_News({datas}){
   return <List typeNews={"One_News"} datas={datas} />
 }*/
 import React from "react"
-export const Article = ()=>{
+export const Article = ({datas})=>{
 
   if(!datas)return
     
@@ -64,10 +64,10 @@ export const Article = ()=>{
               {news?.creator && <h1 >Criador: {news.creator}</h1>}
 
               <div className="main-article">
-                  <h1> {news?.title}</h1>
-                  <h1>{news?.content}</h1>
-                  <h1>{news?.resume}</h1>
-                {news?.imgPath &&  <img src={news.imgPath}/>}
+                  <h1 data-testid="preview_title">{news?.title}</h1>
+                  <h1 data-testid="preview_content">{news?.content}</h1>
+                  <h1 data-testid="preview_resume">{news?.resume}</h1>
+                {news?.imgPath &&  <img data-testid="preview_img"src={news.imgPath}/>}
               </div>
           </>
       )
@@ -82,9 +82,9 @@ export const SubArticles = ({datas})=>{
      
        return (   
        <div className="sub-articles">
-           {elements?.subtTitle && <h2>{elements.subTitle}</h2>}
-           {elements?.imgPath && <img src={elements.imgPath}/>}
-           {elements?.content && <p>{elements.content}</p>}
+           {elements?.subtTitle && <h2 data-testid="preview_subTitle">{elements.subTitle}</h2>}
+           {elements?.imgPath && <img data-testid="preview_subImg" src={elements.imgPath}/>}
+           {elements?.content && <p data-testid="preview_subContent">{elements.content}</p>}
        </div>
    )})
 

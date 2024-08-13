@@ -1,5 +1,5 @@
 import { Container ,Main,Header} from "../styles/index.js"
-import {One_News} from "../components/List_News.jsx"
+//import {One_News} from "../components/List_News.jsx"
 import { NavIcons } from "../components/NavIcons.jsx"
 import {useParams} from 'react-router-dom'
 import { ApiFindNews } from "../service/index.js"
@@ -28,10 +28,12 @@ export  const News = ()=>{
             <NavIcons/>
          </Header>
          <PageNews>
-           <One_News datas={response.datas}/>
+         
          </PageNews>
         
       </div>
     </Container>
  )   
 }
+
+//<One_News datas={response.datas}/>
