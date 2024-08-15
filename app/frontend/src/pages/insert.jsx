@@ -56,22 +56,22 @@ const Elements = ({order,setSubArticles,setSubArtDatas})=>{
     }
     return (
         
-        <div key={order}>
+        <div data-testid="add_subArt" key={order}>
            <h1 >Ordem {order}</h1>
             <div className="subtitle">
                 <h1>Adicione um subtitulo</h1>
-                <input onChange={change} ref={ref.subTitle} type="text"></input>
+                <input  onChange={change} ref={ref.subTitle} type="text"></input>
             </div>
             <div className="subimg">
                 <h1>Adicione uma imagem</h1>
                 <input onChange={change} ref={ref.imgPath} type="file"></input>
             </div>
             <div className="options">
-                    {ref.imgPath.current && <button onClick={removerImg}>remover imagem</button> }
+                    {ref.imgPath.current && <button  onClick={removerImg}>remover imagem</button> }
             </div>
             <div className="subcontent">
                 <h1>Adicione um subcontent</h1>
-                <input onChange={change} type="text" ref={ref.content}></input>
+                <input  onChange={change} type="text" ref={ref.content}></input>
             </div>
          
         <button onClick={()=>removeSubArticles(order)}>Remover subartigo {order}</button>
@@ -131,7 +131,7 @@ export const CreateArticlesForm =()=>{
                     <Elements  order={index+1} key={index} setSubArticles={setSubArticles} setSubArtDatas={setSubArtDatas} />
                 ))}
            </div>
-            <button onClick={addSubArticle}>Adicionar mais subArtigos</button>
+            <button data-testid="moreSubArticles" onClick={addSubArticle}>Adicionar mais subArtigos</button>
 
 
             <ButtonSendDatas setWarningDiv={setWarningDiv} InputValues={InputValues} />
