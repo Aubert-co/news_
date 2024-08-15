@@ -54,25 +54,21 @@ export function One_News({datas}){
   return <List typeNews={"One_News"} datas={datas} />
 }*/
 import React from "react"
-export const Article = ({datas})=>{
+export const Article = ({ datas }) => {
+  if (!datas) return;
 
-  if(!datas)return
-    
-  return  datas.map((news)=>{
-      return (
-          <>
-              {news?.creator && <h1 >Criador: {news.creator}</h1>}
-
-              <div className="main-article">
-                  <h1 data-testid="preview_title">{news?.title}</h1>
-                  <h1 data-testid="preview_content">{news?.content}</h1>
-                  <h1 data-testid="preview_resume">{news?.resume}</h1>
-                {news?.imgPath &&  <img data-testid="preview_img"src={news.imgPath}/>}
-              </div>
-          </>
-      )
-  })
-}
+  return datas.map((news, ind) => {
+    return (
+      <div key={ind} id={`article-${ind}`} className="main-article">
+        {news?.creator && <h1>Criador: {news.creator}</h1>}
+        <h1 data-testid="preview_title">{news?.title}</h1>
+        <h1 data-testid="preview_content">{news?.content}</h1>
+        <h1 data-testid="preview_resume">{news?.resume}</h1>
+        {news?.imgPath && <img data-testid="preview_img" src={news.imgPath} />}
+      </div>
+    );
+  });
+};
 
 export const SubArticles = ({datas})=>{
        
@@ -81,10 +77,10 @@ export const SubArticles = ({datas})=>{
    return datas.map((elements)=>{ 
      
        return (   
-       <div className="sub-articles">
-           {elements?.subtTitle && <h2 data-testid="preview_subTitle">{elements.subTitle}</h2>}
-           {elements?.imgPath && <img data-testid="preview_subImg" src={elements.imgPath}/>}
-           {elements?.content && <p data-testid="preview_subContent">{elements.content}</p>}
+       <div key={elements.order} className="sub-articles">
+           {elements?.subtTitle && <h2  data-testid="preview_subTitle">{elements.subTitle}</h2>}
+           {elements?.imgPath && <img  data-testid="preview_subImg" src={elements.imgPath}/>}
+           {elements?.content && <p  data-testid="preview_subContent">{elements.content}</p>}
        </div>
    )})
 
