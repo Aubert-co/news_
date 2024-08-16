@@ -35,6 +35,8 @@ describe('List Component', () => {
         expect(previewContent.textContent).toEqual(datas.content)
         expect(previewTitlte.textContent).toEqual(datas.title)
         expect(previewRusume.textContent).toEqual(datas.resume)
+
+        
     });
     it.only('verifica se os inputs permanem os memso apos clicar no button de adicionar subartigos', () => {
         render(

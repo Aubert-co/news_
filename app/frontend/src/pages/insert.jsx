@@ -1,6 +1,6 @@
 import React,{ useEffect, useRef, useState } from "react";
 import {InsertStyle} from '../styles/insert'
-import { ButtonSendDatas } from "../components/InserNews";
+import { BtnInsert, ButtonSendDatas } from "../components/BtnInsert";
 import {DivShowWarning} from '../components/ShowWarning'
 import { Preview } from "../components/PreviewArticle";
 import { newImgPath,removeItem } from "../utils";
@@ -79,7 +79,7 @@ const Elements = ({order,setSubArticles,setSubArtDatas})=>{
     )
 }
 
-export const CreateArticlesForm =()=>{
+export const CreateArticlesForm =({type,Action})=>{
     const [showWarningDiv,setWarningDiv] = useState({msg:'',color:''})
     const InputValues = {resume:useRef(""),content:useRef(""),title:useRef(""),
         category:useRef("games"),content:useRef(""),imgPath:useRef("")}
@@ -131,14 +131,14 @@ export const CreateArticlesForm =()=>{
                     <Elements  order={index+1} key={index} setSubArticles={setSubArticles} setSubArtDatas={setSubArtDatas} />
                 ))}
            </div>
-            <button data-testid="moreSubArticles" onClick={addSubArticle}>Adicionar mais subArtigos</button>
+         {type ==="insert" &&  <button data-testid="moreSubArticles" onClick={addSubArticle}>Adicionar mais subArtigos</button>}
 
 
-            <ButtonSendDatas setWarningDiv={setWarningDiv} InputValues={InputValues} />
+            <Action setWarningDiv={setWarningDiv} InputValues={InputValues} />
         </div>
+        
         <div className="preview">
-               
-                <Preview datas={{news:[previewNews],elements:subArticlesDatas}}/>
+            <Preview datas={{news:[previewNews],elements:subArticlesDatas}}/>
         </div>
     </div>
     )
@@ -147,7 +147,7 @@ export const CreateArticlesForm =()=>{
 export const Insert = ()=>{
     return (
         <InsertStyle>
-                <CreateArticlesForm/>
+                <CreateArticlesForm type={"insert"} Action={BtnInsert}/>
         </InsertStyle>
     )
 }

@@ -2,7 +2,9 @@ import React,{ useEffect, useRef, useState } from "react";
 import { ApiInsert } from "../service";
 
 
-export const ButtonSendDatas = ({setWarningDiv,InputValues})=>{
+export const BtnInsert = ({setWarningDiv,InputValues})=>{
+    const elements = InputValues.elements
+    const news = InputValues.news
     const SendForm = async()=>{
         const formData = new FormData()
         const {resume,content,category,title,files} = InputValues
