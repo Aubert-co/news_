@@ -9,7 +9,7 @@
     },[])
     return posts
 }*/
-export const ApiInsert = async({body})=>{
+export const ApiInsert = async({body,})=>{
     const response = await fetch('http://localhost:8080/insert',
         {method:'POST',body}
     )

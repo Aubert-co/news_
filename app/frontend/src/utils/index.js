@@ -11,3 +11,12 @@ export const removeItem = (datas,item)=>datas.filter((_, index) => item !== inde
 .map((val,index)=>{
     return {...val,order:index+1}
 })
+
+
+export const generateFormData = (datas)=>{
+
+    const formData = new FormData()
+    Object.keys(datas).map((val)=>formData.append(val,datas[val]))
+
+    return formData
+}
