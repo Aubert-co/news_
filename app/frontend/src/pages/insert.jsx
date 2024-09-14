@@ -134,7 +134,7 @@ export const CreateArticlesForm =({type,Action})=>{
          {type ==="insert" &&  <button data-testid="moreSubArticles" onClick={addSubArticle}>Adicionar mais subArtigos</button>}
 
 
-            <Action setWarningDiv={setWarningDiv} InputValues={InputValues} />
+            <Action setWarningDiv={setWarningDiv} InputValues={{article:InputValues,elements:subArticlesDatas}} />
         </div>
         
         <div className="preview">

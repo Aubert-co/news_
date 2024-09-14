@@ -1,4 +1,4 @@
-
+import fetch from 'node-fetch'
 /*export const useFetchPosts = (category)=>{
     const [posts,setPosts] = useState([])
 
@@ -9,9 +9,11 @@
     },[])
     return posts
 }*/
-export const ApiInsert = async({body,})=>{
+export const ApiInsert = async(payload)=>{
     const response = await fetch('http://localhost:8080/insert',
-        {method:'POST',body}
+        {method:'POST',
+            body:payload
+        }
     )
     return {status:response.status}
 }

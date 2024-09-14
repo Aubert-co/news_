@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+ 
   "scripts": {
     "start:dev": "webpack serve --mode=development",
     "build": "webpack --mode development",
-    "test": "jest /insert.test.js"
+    "test": "jest /BtnInsert.test.js"
   },
   "dependencies": {
     "react": "18.2.0",

@@ -13,10 +13,11 @@ export const removeItem = (datas,item)=>datas.filter((_, index) => item !== inde
 })
 
 
-export const generateFormData = (datas)=>{
-
-    const formData = new FormData()
-    Object.keys(datas).map((val)=>formData.append(val,datas[val]))
-
-    return formData
-}
+export const generateFormData = (datas) => {
+    const formData = new FormData();
+    Object.entries(datas).forEach(([key, value]) => {
+        console.log(datas)
+        if(value)formData.append(key, value);
+    });
+    return formData;
+};
